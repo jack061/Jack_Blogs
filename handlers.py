@@ -42,5 +42,5 @@ async def api_get_users():
 async def api_get_users():
     users = await User.findAll(orderBy='created_at desc')
     for u in users:
-        u.passwd = '******'
+        u.passwd = '*****sdfdsfsdafadsfasdfd*'
     return dict(users=users)    
