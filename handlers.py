@@ -39,8 +39,8 @@ async def api_get_users():
         u.passwd = '******'
     return dict(users=users)
 @get('/api/users2')
-async def api_get_users():
+async def api_get_usersdds():
     users = await User.findAll(orderBy='created_at desc')
     for u in users:
-        u.passwd = '*****sdfdsfsdafadsfasdfd*'
+        u.passwd = '*****ad*'
     return dict(users=users)    
