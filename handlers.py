@@ -31,7 +31,7 @@ def index(request):
 @get('/blog/{id}')
 async def lbj(**kw):
     st=str(kw['id'])
-    return web.Response(body=b'<h1>Awesome55555%s</h1>' % bytes(st, 'utf8'), content_type='text/html')
+    return web.Response(sbody=b'<h1>Awesome55555%s</h1>' % bytes(st, 'utf8'), content_type='text/html')
 @get('/api/users')
 async def api_get_users():
     users = await User.findAll(orderBy='created_at desc')
