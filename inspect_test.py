@@ -26,3 +26,8 @@ for k, v in bb.items():
     default = v.default
     print("parameter default:%s" % default)
     print(type(default))
+
+import hashlib
+sha1_passwd = '%s:%s' % ('lbja2', '123')
+passwd = hashlib.sha1(sha1_passwd.encode('utf-8')).hexdigest()
+print(passwd)

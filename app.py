@@ -18,6 +18,7 @@ import orm
 #from www.coroweb2 import add_routes, add_static
 from coroweb import add_routes, add_static
 from config import configs
+from handlers import cookie2user,COOKIE_NAME
 import nest_asyncio
 nest_asyncio.apply()
 def init_jinja2(app, **kw):
@@ -59,7 +60,20 @@ async def data_factory(app, handler):
                 logging.info('request form: %s' % str(request.__data__))
         return (await handler(request))
     return parse_data
-
+async def auth_factory(app, handler):
+    async def auth(request):
+        logging.info('check user:%s %s' % (request.method, request.path))
+        request.__user__ = None
+        cokkie_str = request.cookies.get(COOKIE_NAME)
+        if cokkie_str:
+            user = await cookie2user(cokkie_str)
+            if user:
+                logging.info('set current user:%s' % user.email)
+                request.__user__ = user
+        if request.path.startswith('/manage/') and (request.__user__ is None or not request.__user__.admin):
+            return web.HTTPFound('/signin')
+        return await handler(request)
+    return auth        
 async def response_factory(app, handler):
     async def response(request):
         logging.info('Response handler...')
@@ -114,12 +128,12 @@ def datetime_filter(t):
 async def init(loop):
     await orm.create_pool(loop=loop,**configs.db)
     app = web.Application(loop=loop, middlewares=[
-        logger_factory, response_factory
+        logger_factory,auth_factory, response_factory
     ])
     init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
-    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 1113)
+    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 1115)
     logging.info('server started at http://127.0.0.1:9000...')
     return srv
 
